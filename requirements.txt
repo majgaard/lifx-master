@@ -1,2 +1,4 @@
 lifxlan==1.2.5
 python-daemon
+netifaces
+bitstring

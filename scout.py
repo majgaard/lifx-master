@@ -4,7 +4,7 @@ import time
 from lifxlan import LifxLAN
 
 
-HOSTNAME = "192.168.1.10"
+HOSTNAME = "lamp.cosmo.lan"
 NUM_LIGHTS = 3
 
 def is_master_online():
@@ -31,6 +31,7 @@ def mainloop():
                 for light in lightgroup.get_lights():
                     light.set_power(True)
                 currently_on = state
+            time.sleep(1)
         else:
             print("Master is down!")
             if currently_on:
@@ -38,8 +39,6 @@ def mainloop():
                 for light in lightgroup.get_lights():
                     light.set_power(False)
                 currently_on = state
-        
-        time.sleep(1)
 
 
 def run():
