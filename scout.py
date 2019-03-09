@@ -1,12 +1,14 @@
 import daemon
 import os
 import time
+from lifxlan import LifxLAN
 
-hostname = "192.168.1.10"
 
+HOSTNAME = "192.168.1.10"
+NUM_LIGHTS = 3
 
 def is_master_online():
-    response = os.system("ping -c 1 -W 1 %s > /dev/null" % hostname)
+    response = os.system("ping -c 1 -W 1 %s > /dev/null" % HOSTNAME)
 
     if response == 0:
         return True
@@ -15,6 +17,7 @@ def is_master_online():
 
 
 def mainloop():
+    lightgroup = LifxLAN(NUM_LIGHTS)
     currently_on = is_master_online()
 
     while True:
@@ -25,11 +28,15 @@ def mainloop():
 
             if not currently_on:
                 print("Turning on all lights.")
+                for light in lightgroup.get_lights():
+                    light.set_power(True)
                 currently_on = state
         else:
             print("Master is down!")
             if currently_on:
                 print("Turning off all lights.")
+                for light in lightgroup.get_lights():
+                    light.set_power(False)
                 currently_on = state
         
         time.sleep(1)
