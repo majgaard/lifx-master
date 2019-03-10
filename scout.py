@@ -4,11 +4,14 @@ import time
 from lifxlan import LifxLAN
 
 
-HOSTNAME = "lamp.cosmo.lan"
+MASTER_HOSTNAME = "lamp.cosmo.lan"
 NUM_LIGHTS = 3
+GROUP_NAME = "Meeting Room"
+IN_DURATION = 1000
+OUT_DURATION = 3000
 
 def is_master_online():
-    response = os.system("ping -c 1 -W 1 %s > /dev/null" % HOSTNAME)
+    response = os.system("ping -c 4 -i 0.2 -W 2 %s > /dev/null" % MASTER_HOSTNAME)
 
     if response == 0:
         return True
@@ -17,7 +20,7 @@ def is_master_online():
 
 
 def mainloop():
-    lightgroup = LifxLAN(NUM_LIGHTS)
+    lan = LifxLAN(NUM_LIGHTS)
     currently_on = is_master_online()
 
     while True:
@@ -28,16 +31,14 @@ def mainloop():
 
             if not currently_on:
                 print("Turning on all lights.")
-                for light in lightgroup.get_lights():
-                    light.set_power(True)
+                lan.get_devices_by_group(GROUP_NAME).set_power(True, IN_DURATION)
                 currently_on = state
             time.sleep(1)
         else:
             print("Master is down!")
             if currently_on:
                 print("Turning off all lights.")
-                for light in lightgroup.get_lights():
-                    light.set_power(False)
+                lan.get_devices_by_group(GROUP_NAME).set_power(False, OUT_DURATION)
                 currently_on = state
 
 
